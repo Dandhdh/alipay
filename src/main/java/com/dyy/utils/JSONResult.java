@@ -7,63 +7,61 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
- * @Title: LeeJSONResult.java
- * @Package com.lee.utils
- * @Description: è‡ªå®šä¹‰å“åº”æ•°æ®ç»“æ„
- * 				è¿™ä¸ªç±»æ˜¯æä¾›ç»™é—¨æˆ·ï¼Œiosï¼Œå®‰å“ï¼Œå¾®ä¿¡å•†åŸç”¨çš„
- * 				é—¨æˆ·æ¥å—æ­¤ç±»æ•°æ®åéœ€è¦ä½¿ç”¨æœ¬ç±»çš„æ–¹æ³•è½¬æ¢æˆå¯¹äºçš„æ•°æ®ç±»å‹æ ¼å¼ï¼ˆç±»ï¼Œæˆ–è€…listï¼‰
- * 				å…¶ä»–è‡ªè¡Œå¤„ç†
- * 				200ï¼šè¡¨ç¤ºæˆåŠŸ
- * 				500ï¼šè¡¨ç¤ºé”™è¯¯ï¼Œé”™è¯¯ä¿¡æ¯åœ¨msgå­—æ®µä¸­
- * 				501ï¼šbeanéªŒè¯é”™è¯¯ï¼Œä¸ç®¡å¤šå°‘ä¸ªé”™è¯¯éƒ½ä»¥mapå½¢å¼è¿”å›
- * 				502ï¼šæ‹¦æˆªå™¨æ‹¦æˆªåˆ°ç”¨æˆ·tokenå‡ºé”™
- * 				555ï¼šå¼‚å¸¸æŠ›å‡ºä¿¡æ¯
+ * @Description: ×Ô¶¨ÒåÏìÓ¦Êı¾İ½á¹¹
+ * 				Õâ¸öÀàÊÇÌá¹©¸øÃÅ»§£¬ios£¬°²×¿£¬Î¢ĞÅÉÌ³ÇÓÃµÄ
+ * 				ÃÅ»§½ÓÊÜ´ËÀàÊı¾İºóĞèÒªÊ¹ÓÃ±¾ÀàµÄ·½·¨×ª»»³É¶ÔÓÚµÄÊı¾İÀàĞÍ¸ñÊ½£¨Àà£¬»òÕßlist£©
+ * 				ÆäËû×ÔĞĞ´¦Àí
+ * 				200£º±íÊ¾³É¹¦
+ * 				500£º±íÊ¾´íÎó£¬´íÎóĞÅÏ¢ÔÚmsg×Ö¶ÎÖĞ
+ * 				501£ºbeanÑéÖ¤´íÎó£¬²»¹Ü¶àÉÙ¸ö´íÎó¶¼ÒÔmapĞÎÊ½·µ»Ø
+ * 				502£ºÀ¹½ØÆ÷À¹½Øµ½ÓÃ»§token³ö´í
+ * 				555£ºÒì³£Å×³öĞÅÏ¢
  */
-public class LeeJSONResult {
+public class JSONResult {
 
-    // å®šä¹‰jacksonå¯¹è±¡
+    // ¶¨Òåjackson¶ÔÏó
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    // å“åº”ä¸šåŠ¡çŠ¶æ€
+    // ÏìÓ¦ÒµÎñ×´Ì¬
     private Integer status;
 
-    // å“åº”æ¶ˆæ¯
+    // ÏìÓ¦ÏûÏ¢
     private String msg;
 
-    // å“åº”ä¸­çš„æ•°æ®
+    // ÏìÓ¦ÖĞµÄÊı¾İ
     private Object data;
     
-    private String ok;	// ä¸ä½¿ç”¨
+    private String ok;	// ²»Ê¹ÓÃ
 
-    public static LeeJSONResult build(Integer status, String msg, Object data) {
-        return new LeeJSONResult(status, msg, data);
-    }
-
-    public static LeeJSONResult ok(Object data) {
-        return new LeeJSONResult(data);
+    public static JSONResult build(Integer status, String msg, Object data) {
+        return new JSONResult(status, msg, data);
     }
 
-    public static LeeJSONResult ok() {
-        return new LeeJSONResult(null);
-    }
-    
-    public static LeeJSONResult errorMsg(String msg) {
-        return new LeeJSONResult(500, msg, null);
-    }
-    
-    public static LeeJSONResult errorMap(Object data) {
-        return new LeeJSONResult(501, "error", data);
-    }
-    
-    public static LeeJSONResult errorTokenMsg(String msg) {
-        return new LeeJSONResult(502, msg, null);
-    }
-    
-    public static LeeJSONResult errorException(String msg) {
-        return new LeeJSONResult(555, msg, null);
+    public static JSONResult ok(Object data) {
+        return new JSONResult(data);
     }
 
-    public LeeJSONResult() {
+    public static JSONResult ok() {
+        return new JSONResult(null);
+    }
+    
+    public static JSONResult errorMsg(String msg) {
+        return new JSONResult(500, msg, null);
+    }
+    
+    public static JSONResult errorMap(Object data) {
+        return new JSONResult(501, "error", data);
+    }
+    
+    public static JSONResult errorTokenMsg(String msg) {
+        return new JSONResult(502, msg, null);
+    }
+    
+    public static JSONResult errorException(String msg) {
+        return new JSONResult(555, msg, null);
+    }
+
+    public JSONResult() {
 
     }
 
@@ -71,13 +69,13 @@ public class LeeJSONResult {
 //        return new LeeJSONResult(status, msg, null);
 //    }
 
-    public LeeJSONResult(Integer status, String msg, Object data) {
+    public JSONResult(Integer status, String msg, Object data) {
         this.status = status;
         this.msg = msg;
         this.data = data;
     }
 
-    public LeeJSONResult(Object data) {
+    public JSONResult(Object data) {
         this.status = 200;
         this.msg = "OK";
         this.data = data;
@@ -113,16 +111,16 @@ public class LeeJSONResult {
 
     /**
      * 
-     * @Description: å°†jsonç»“æœé›†è½¬åŒ–ä¸ºLeeJSONResultå¯¹è±¡
-     * 				éœ€è¦è½¬æ¢çš„å¯¹è±¡æ˜¯ä¸€ä¸ªç±»
+     * @Description: ½«json½á¹û¼¯×ª»¯ÎªLeeJSONResult¶ÔÏó
+     * 				ĞèÒª×ª»»µÄ¶ÔÏóÊÇÒ»¸öÀà
      * @param jsonData
      * @param clazz
      * @return
      */
-    public static LeeJSONResult formatToPojo(String jsonData, Class<?> clazz) {
+    public static JSONResult formatToPojo(String jsonData, Class<?> clazz) {
         try {
             if (clazz == null) {
-                return MAPPER.readValue(jsonData, LeeJSONResult.class);
+                return MAPPER.readValue(jsonData, JSONResult.class);
             }
             JsonNode jsonNode = MAPPER.readTree(jsonData);
             JsonNode data = jsonNode.get("data");
@@ -142,13 +140,13 @@ public class LeeJSONResult {
 
     /**
      * 
-     * @Description: æ²¡æœ‰objectå¯¹è±¡çš„è½¬åŒ–
+     * @Description: Ã»ÓĞobject¶ÔÏóµÄ×ª»¯
      * @param json
      * @return
      */
-    public static LeeJSONResult format(String json) {
+    public static JSONResult format(String json) {
         try {
-            return MAPPER.readValue(json, LeeJSONResult.class);
+            return MAPPER.readValue(json, JSONResult.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -157,13 +155,13 @@ public class LeeJSONResult {
 
     /**
      * 
-     * @Description: Objectæ˜¯é›†åˆè½¬åŒ–
-     * 				éœ€è¦è½¬æ¢çš„å¯¹è±¡æ˜¯ä¸€ä¸ªlist
+     * @Description: ObjectÊÇ¼¯ºÏ×ª»¯
+     * 				ĞèÒª×ª»»µÄ¶ÔÏóÊÇÒ»¸ölist
      * @param jsonData
      * @param clazz
      * @return
      */
-    public static LeeJSONResult formatToList(String jsonData, Class<?> clazz) {
+    public static JSONResult formatToList(String jsonData, Class<?> clazz) {
         try {
             JsonNode jsonNode = MAPPER.readTree(jsonData);
             JsonNode data = jsonNode.get("data");

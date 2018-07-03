@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.dyy.utils.JSONResult;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,6 @@ import com.dyy.pojo.Product;
 import com.dyy.service.OrdersService;
 import com.dyy.service.ProductService;
 import com.dyy.utils.AlipayConfig;
-import com.dyy.utils.LeeJSONResult;
 import com.dyy.utils.OrderStatusEnum;
 
 @Controller
@@ -79,7 +79,7 @@ public class AlipayController {
 
 	/**
 	 *
-	 * @param productId
+	 * @param order 订单类
 	 * @return
 	 * @throws Exception
 	 */
@@ -112,11 +112,12 @@ public class AlipayController {
 	 */
 	@RequestMapping(value = "/createOrder")
 	@ResponseBody
-	public LeeJSONResult createOrder(Orders order) throws Exception {
+	public JSONResult createOrder(Orders order) throws Exception {
 
 		Product p = productService.getProductById(order.getProductId());
 
 		String orderId = sid.nextShort();
+		// 保存订单到数据库
 		order.setId(orderId);
 		order.setOrderNum(orderId);
 		order.setCreateTime(new Date());
@@ -124,7 +125,7 @@ public class AlipayController {
 		order.setOrderStatus(OrderStatusEnum.WAIT_PAY.key);
 		orderService.saveOrder(order);
 
-		return LeeJSONResult.ok(orderId);
+		return JSONResult.ok(orderId);
 	}
 
 	/**
@@ -149,16 +150,7 @@ public class AlipayController {
 	}
 
 	/**
-	 *
-	 * @Title: AlipayController.java
-	 * @Package com.sihai.controller
 	 * @Description: 前往支付宝第三方网关进行支付
-	 * Copyright: Copyright (c) 2017
-	 * Company:FURUIBOKE.SCIENCE.AND.TECHNOLOGY
-	 *
-	 * @author sihai
-	 * @date 2017年8月23日 下午8:50:43
-	 * @version V1.0
 	 */
 	@RequestMapping(value = "/goAlipay", produces = "text/html; charset=UTF-8")
 	@ResponseBody
@@ -198,20 +190,25 @@ public class AlipayController {
 		//请求
 		String result = alipayClient.pageExecute(alipayRequest).getBody();
 
+        /**
+         * result:
+         * <form
+         *  name="punchout_form"
+         *  method="post"
+         *  action="https://openapi.alipaydev.com/gateway.do?charset=utf-8&method=alipay.trade.page.pay&sign=buw72dYFMgL3iAEISIaudl4VfVVzfadZ2hAPjHrdXUVhKidzLos1AAgZ6zr4ZWjT%2FOBPPIC5ZLZA2gWOu%2BbIqpl%2BlDTDFm16nc8SKp01DbGJZNjT3gNRmVtKuQy3bwmb5WqFcKW01kyIQf5F5s92J4MoocnB3ysjtKkGVfRrnEyKsKew7FpJ9ze7l9vKoyQMXqEmqSYqBJG4RmViyf7q9MbpO%2FPV5xWrhD08QdY8vKOBf69hSkVz6%2Fva3sIYCT8phUpYJ1e8fLoDzIo4QSHrJWkRXwF0EKfhFVHmEH9042MsCmpVnPTOvx%2BJF7CBXiexbXTvjBuRYfO4fX1bql2HgA%3D%3D&return_url=http%3A%2F%2Flocalhost%3A8080%2Falipay.trade.page.pay-JAVA-UTF-8%2Freturn_url.jsp&notify_url=http%3A%2F%2Flocalhost%3A8080%2Falipay.trade.page.pay-JAVA-UTF-8%2Fnotify_url.jsp&version=1.0&app_id=2016091300504420&sign_type=RSA2&timestamp=2018-07-03+15%3A27%3A08&alipay_sdk=alipay-sdk-java-3.1.0&format=json"
+         * >
+         * <input type="hidden" name="biz_content" value="{&quot;out_trade_no&quot;:&quot;180703B0RDC41SY8&quot;,&quot;total_amount&quot;:&quot;0.01&quot;,&quot;subject&quot;:&quot;冰棍&quot;,&quot;body&quot;:&quot;鐢ㄦ埛璁㈣喘鍟嗗搧涓暟锛?1&quot;,&quot;timeout_express&quot;:&quot;1c&quot;,&quot;product_code&quot;:&quot;FAST_INSTANT_TRADE_PAY&quot;}">
+         * <input type="submit" value="立即支付" style="display:none" >
+         * </form>
+         */
+        log.info("生成支付的form："+result);
+
 		return result;
 	}
 
 	/**
 	 *
-	 * @Title: AlipayController.java
-	 * @Package com.sihai.controller
 	 * @Description: 支付宝同步通知页面
-	 * Copyright: Copyright (c) 2017
-	 * Company:FURUIBOKE.SCIENCE.AND.TECHNOLOGY
-	 *
-	 * @author sihai
-	 * @date 2017年8月23日 下午8:51:01
-	 * @version V1.0
 	 */
 	@RequestMapping(value = "/alipayReturnNotice")
 	public ModelAndView alipayReturnNotice(HttpServletRequest request, HttpServletRequest response) throws Exception {
@@ -276,16 +273,7 @@ public class AlipayController {
 	}
 
 	/**
-	 *
-	 * @Title: AlipayController.java
-	 * @Package com.sihai.controller
 	 * @Description: 支付宝异步 通知页面
-	 * Copyright: Copyright (c) 2017
-	 * Company:FURUIBOKE.SCIENCE.AND.TECHNOLOGY
-	 *
-	 * @author sihai
-	 * @date 2017年8月23日 下午8:51:13
-	 * @version V1.0
 	 */
 	@RequestMapping(value = "/alipayNotifyNotice")
 	@ResponseBody
@@ -312,7 +300,8 @@ public class AlipayController {
 		boolean signVerified = AlipaySignature.rsaCheckV1(params, AlipayConfig.alipay_public_key, AlipayConfig.charset, AlipayConfig.sign_type); //调用SDK验证签名
 
 		//——请在这里编写您的程序（以下代码仅作参考）——
-		
+		// TODO
+
 		/* 实际验证过程建议商户务必添加以下校验：
 		1、需要验证该通知数据中的out_trade_no是否为商户系统中创建的订单号，
 		2、判断total_amount是否确实为该订单的实际金额（即商户订单创建时的金额），
